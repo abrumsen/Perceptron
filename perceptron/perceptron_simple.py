@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from perceptron.perceptron_base import Perceptron
+from perceptron import Perceptron
 
 
 class PerceptronSimple(Perceptron):
@@ -15,7 +15,7 @@ class PerceptronSimple(Perceptron):
         :param potential: The calculated potential.
         :return: 1 if activated, 0 if not.
         """
-        return 1 if potential > 0 else 0
+        return 1 if potential >= 0 else 0
 
     def predict(self, inputs: np.ndarray) -> int:
         """
@@ -31,8 +31,7 @@ class PerceptronSimple(Perceptron):
         :param error: The difference between the predicted and expected value.
         :param x: The input vector (includes bias).
         """
-        for i in range(len(x)):
-            self.weights[i] += self.learning_rate * error * x[i]
+        self.weights += self.learning_rate * error * x
 
     def train(self, training_data: pd.DataFrame) -> int:
         """

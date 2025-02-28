@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class Perceptron:
     def __init__(self, input_size: int, learning_rate: float = 0.3, epochs: int = 1000) -> None:
         if type(self) is Perceptron:
