@@ -27,13 +27,12 @@ def add_p_data_to_dataframe(iteration:int, weights:list, variables:list, obtaine
     :param expected_value:
     :return:
     """
-    p_data = {"Weights":[weights], "Variables":[variables], "Obtained_value": obtained_value, "Expected_value": expected_value}
-    dtf = pd.DataFrame(p_data, index=[f"Itération {iteration}"])
+    p_data = {"Iteration" : [iteration], "Weights":[weights], "Variables":[variables], "Obtained_value": obtained_value, "Expected_value": expected_value}
+    dtf = pd.DataFrame(p_data)
     return dtf
 
 def load_dataframe_from_file(file_name:str="data.csv"):
     loaded_df = pd.read_csv(file_name, index_col=0, sep=";")
-    print(loaded_df.apply(lambda x: x[::-1]))
     return loaded_df.apply(lambda x: x[::-1])
 
 def demonstration():
