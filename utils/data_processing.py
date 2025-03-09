@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 import os
 
-
 def store_data(dataframe:pd.DataFrame, file_path:str):
     """
     Creates or completes a csv based on the supplied dataframe
@@ -11,17 +10,12 @@ def store_data(dataframe:pd.DataFrame, file_path:str):
     :return: returns None
     """
     if os.path.isfile(file_path):
-        df = pd.read_csv(file_path, index_col=0, sep=";")
+        df = pd.read_csv(file_path, index_col= 0,sep=";")
         frames = [dataframe, df]
-        big_dataframe = pd.concat(frames, axis=1)
+        big_dataframe = pd.concat(frames, axis=0)
     else:
         big_dataframe = dataframe
-    print(big_dataframe)
-    big_dataframe.to_csv('data.csv', index=True, sep=";")
-
-
-
-
+    big_dataframe.to_csv(file_path, index=True, sep=";", mode="w")
 
 def add_p_data_to_dataframe(iteration:int, weights:list, variables:list, obtained_value:float,expected_value:float):
     """
@@ -33,10 +27,19 @@ def add_p_data_to_dataframe(iteration:int, weights:list, variables:list, obtaine
     :param expected_value:
     :return:
     """
-    p_data = {f"Iteration {iteration}":{"weights":weights, "variables":variables, "obtained_value": obtained_value, "expected_value": expected_value}}
-    dtf = pd.DataFrame(p_data)
+    p_data = {"Weights":[weights], "Variables":[variables], "Obtained_value": obtained_value, "Expected_value": expected_value}
+    dtf = pd.DataFrame(p_data, index=[f"Itération {iteration}"])
     return dtf
 
-# store_data(add_p_data_to_dataframe(4,[5,7],[8,9],10.5,10.6), "./data.csv")
-# df = pd.read_csv("data.csv", index_col=0)
-# print(df)
+def load_dataframe_from_file(file_name:str="data.csv"):
+    loaded_df = pd.read_csv(file_name, index_col=0, sep=";")
+    print(loaded_df.apply(lambda x: x[::-1]))
+    return loaded_df.apply(lambda x: x[::-1])
+
+def demonstration():
+    store_data(add_p_data_to_dataframe(1, [5, 7], [4, 8], 12.5, 10.6), "./data.csv")
+    store_data(add_p_data_to_dataframe(2, [6, 8], [9, 8], 13.5, 11.6), "./data.csv")
+    store_data(add_p_data_to_dataframe(3, [6, 8], [9, 8], 13.5, 11.6), "./data.csv")
+    store_data(add_p_data_to_dataframe(4, [6, 8], [9, 8], 13.5, 11.6), "./data.csv")
+    load_dataframe_from_file()
+
