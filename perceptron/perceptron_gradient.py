@@ -74,12 +74,3 @@ class PerceptronGradient(Perceptron):
             self.correct(y, training_data["label"], training_data["inputs"])
         print(f"Training stopped after {self.epochs} epochs with error {np.mean(error)}")
         return 0
-
-
-training_data = pd.DataFrame({
-    "inputs": [np.array([1, 0, 0]), np.array([1, 0, 1]), np.array([1, 1, 0]), np.array([1, 1, 1])],
-    "label": [-1, -1, -1, 1]
-})
-
-perceptron = PerceptronGradient(input_size=2, learning_rate=0.25, epochs=10000)
-perceptron.train(training_data=training_data, seuil=0.125001)
