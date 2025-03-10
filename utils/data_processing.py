@@ -15,6 +15,7 @@ def store_data(dataframe:pd.DataFrame, file_path:str):
         big_dataframe = pd.concat(frames, axis=0)
     else:
         big_dataframe = dataframe
+    big_dataframe = big_dataframe.sort_values(by="Iteration")
     big_dataframe.to_csv(file_path, index=True, sep=";", mode="w")
 
 def add_p_data_to_dataframe(iteration:int, weights:list, variables:list, obtained_value:float,expected_value:float):
@@ -33,7 +34,7 @@ def add_p_data_to_dataframe(iteration:int, weights:list, variables:list, obtaine
 
 def load_dataframe_from_file(file_name:str="data.csv"):
     loaded_df = pd.read_csv(file_name, index_col=0, sep=";")
-    return loaded_df.apply(lambda x: x[::-1])
+    return loaded_df
 
 def demonstration():
     store_data(add_p_data_to_dataframe(1, [5, 7], [4, 8], 12.5, 10.6), "./data.csv")
