@@ -34,14 +34,26 @@ class PerceptronGradient(Perceptron):
 
 
     @staticmethod
-    def error(array_y:np.ndarray, array_s:np.ndarray) -> np.ndarray:
+    def error_classification(array_y:np.ndarray, array_s:np.ndarray) -> np.ndarray:
         """
-        Computes the error for a single epoch of training.
+        Computes the error for a single epoch of training in mode classification.
         :param array_y: The predicted outputs from the perceptron.
         :param array_s: The actual outputs after applying the activation function.
         :return: The error value for each sample in the dataset.
         """
         array_error = 0.5*(array_y - array_s)**2
+        return array_error
+
+
+    @staticmethod
+    def error_regression(array_y:np.ndarray, array_d: np.ndarray) -> np.ndarray:
+        """
+        Computes the error for a single epoch of training in mode regression.
+        :param array_y: The predicted outputs from the perceptron.
+        :param array_d The actual outputs.
+        :return: The error value for each sample in the dataset.
+        """
+        array_error = 0.5*(array_d - array_y)**2
         return array_error
 
 
@@ -56,9 +68,9 @@ class PerceptronGradient(Perceptron):
         self.weights += self.learning_rate * np.dot(array_error_to_correct, array_x)
 
 
-    def train(self, training_data: pd.DataFrame, seuil: float) -> int:
+    def classification_train(self, training_data: pd.DataFrame, seuil: float) -> int:
         """
-        Trains the perceptron using the given training data.
+        Trains the perceptron with classification using the given training data.
         Stops when the error is below the specified threshold or after completing all epochs.
         :param training_data: A DataFrame containing the training data with inputs and labels.
         :param seuil: The threshold for error to stop training.
@@ -67,10 +79,48 @@ class PerceptronGradient(Perceptron):
         for epoch in range(self.epochs):
             y = self.predict(training_data)
             s = self.activation_function(y)
-            error = self.error(y, s)
+            error = self.error_classification(y, s)
             if np.mean(error) <= seuil and (s == training_data["label"].values).all():
-                print(f"Training complete for {epoch + 1} epochs with error {np.mean(error)}\nw0 : {self.weights[0]}\nw1 : {self.weights[1]}\nw2 : {self.weights[2]}")
+                print(
+                    f"Training complete for {epoch + 1} epochs with error {np.mean(error)}\nw0 : {self.weights[0]}\nw1 : {self.weights[1]}\nw2 : {self.weights[2]}")
                 return 1
             self.correct(y, training_data["label"], training_data["inputs"])
         print(f"Training stopped after {self.epochs} epochs with error {np.mean(error)}")
         return 0
+
+
+    def regression_train(self, training_data: pd.DataFrame, seuil: float) -> int:
+        """
+        Trains the perceptron with regression using the given training data.
+        Stops when the error is below the specified threshold or after completing all epochs.
+        :param training_data: A DataFrame containing the training data with inputs and labels.
+        :param seuil: The threshold for error to stop training.
+        :return: 1 if training is successful, 0 if it stops after all epochs.
+        """
+        for epoch in range(self.epochs):
+            y = self.predict(training_data)
+            d = training_data["label"].values
+            error = self.error_regression(y,d)
+            if np.mean(error) <= seuil:
+                print(
+                    f"Training complete for {epoch + 1} epochs with error {np.mean(error)}\nw0 : {self.weights[0]}\nw1 : {self.weights[1]}\n")
+                return 1
+            self.correct(y, training_data["label"], training_data["inputs"])
+        print(f"Training stopped after {self.epochs} epochs with error {np.mean(error)}")
+        return 0
+
+
+    def mode_choose(self, training_data: pd.DataFrame, seuil: float, mode: bool) -> int:
+        """
+        Chooses the training mode for the perceptron: classification or regression.
+        Executes the corresponding training method based on the specified mode.
+        :param training_data: A DataFrame containing the training data with inputs and labels.
+        :param seuil: The threshold for error to stop training.
+        :param mode: A boolean indicating the training mode.
+                     True for classification, False for regression.
+        :return: 1 if training is successful, 0 if it stops after all epochs.
+        """
+        if mode:
+            return self.classification_train(training_data, seuil)
+        else:
+            return self.regression_train(training_data, seuil)
