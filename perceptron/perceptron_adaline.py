@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from numpy import ndarray
 
 from perceptron import Perceptron
 
@@ -13,9 +14,14 @@ class PerceptronAdaline(Perceptron):
         array_s = np.where(array_y >= 0, 1, -1)
         return array_s
 
-    def predict(self, data: np.ndarray) -> float:
+    def predict(self, data: np.ndarray) -> ndarray:
         # return self.activation_function(np.dot(self.weights, data))
         return np.dot(self.weights, data)
+
+    def round_predict(self, data: np.ndarray) -> ndarray:
+        # return self.activation_function(np.dot(self.weights, data))
+        array = np.dot(self.weights, data)
+        return self.activation_function(array)
 
     def correct_weights(self, expected_value, actual_value, inputs):
         self.weights += self.learning_rate * (expected_value - actual_value) * inputs
@@ -42,6 +48,7 @@ class PerceptronAdaline(Perceptron):
         training_data = dataset["inputs"].values
         expected_values = dataset["label"].values
         for epoch in range(self.epochs):
+
             obtained_values = np.array([])
             for i in range(len(training_data)):
                 data = training_data[i]
@@ -52,11 +59,12 @@ class PerceptronAdaline(Perceptron):
                 obtained_values = np.append(obtained_values,prediction)
             mean_quad_error = self.mean_quadratic_error(expected_values, training_data)
             if mean_quad_error < seuil:
-                print(f"Training complete for {epoch + 1} epochs, epochs with quad error {mean_quad_error} and error {error}\nw0 : {self.weights[0]}\nw1 : {self.weights[1]}\nw2 : {self.weights[2]}\nThe obtained values: {self.activation_function(obtained_values)}, the expected values: {expected_values}")
+                print(
+                    f"Training complete for {epoch + 1} epochs, epochs with quad error {mean_quad_error} and error {error}\nw0 : {self.weights[0]}\nw1 : {self.weights[1]}\nw2 : {self.weights[2]}\nThe obtained values: {self.activation_function(obtained_values)}, the expected values: {expected_values}")
                 # print(f"Training complete for {epoch + 1} epochs, epochs with quad error {mean_quad_error} and error {error}\nw0 : {self.weights[0]}\nw1 : {self.weights[1]}\nw2 : {self.weights[2]}\nThe obtained values: {obtained_values}, the expected values: {expected_values}")
                 return True
         # print(f"Training uncomplete after {self.epochs} epochs, epochs with error {mean_quad_error} and error {error}\nw0 : {self.weights[0]}\nw1 : {self.weights[1]}\nw2 : {self.weights[2]}\nThe obtained values: {obtained_values}, the expected values: {expected_values}")
-        print(f"Training uncomplete after {self.epochs} epochs, epochs with error {mean_quad_error} and error {error}\nw0 : {self.weights[0]}\nw1 : {self.weights[1]}\nw2 : {self.weights[2]}\nThe obtained values: {self.activation_function(obtained_values)}, the expected values: {expected_values}")
+        print(f"Training uncomplete after {self.epochs} epochs, epochs with quad error {mean_quad_error} and error {error}\nw0 : {self.weights[0]}\nw1 : {self.weights[1]}\nw2 : {self.weights[2]}\nThe obtained values: {self.activation_function(obtained_values)}, the expected values: {expected_values}")
         return False
 
 
