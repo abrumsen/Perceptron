@@ -6,9 +6,9 @@ Implementing different types of perceptrons from scratch without deep learning l
 ```bash
 .
 ├── datasets            # Training and validation data
+├── ml                  # Core ML logic
+├── notebooks           # Jupyter notebooks for demos/experiments
 ├── LICENSE
-├── main.py             # Entrypoint
-├── perceptron          # Perceptron implementations
 ├── README.md           # Documentation
 ├── requirements.txt    # Dependencies
 ├── tests               # Unit tests
@@ -20,12 +20,6 @@ Implementing different types of perceptrons from scratch without deep learning l
 1. Clone the project
 2. Create a virtual environment (optional but recommended)
 3. Install dependencies with pip
-
-## ⚡ Getting started
-
-```bash
-python main.py --model <modelname>
-```
 
 ## 👨‍💻 Contributors
 
