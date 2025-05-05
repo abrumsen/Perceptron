@@ -5,9 +5,10 @@ from ml.activation import Activation
 
 class Layer:
     """
-    A class representing a single layer in a neural network.
+    A class representing a single layer in a neural network. It is made up of one or more neurons.
     """
-    def __init__(self, units:int, activation:str, input_size:np.ndarray | None=None, **activation_kwargs) -> None:
+
+    def __init__(self, units:int, activation:str, input_size:int | None=None, **activation_kwargs) -> None:
         """
         Initializes a new neuron layer.
         :param units: The number of neurons in the layer.
@@ -25,16 +26,22 @@ class Layer:
         self.activation = Activation(activation, **activation_kwargs)
 
         if input_size:
-            self.initialize_neurons(input_size[0])  # e.g., [num_features, 0]
+            self.initialize_neurons(input_size)
 
-    def initialize_neurons(self, input_dim):
+    def __repr__(self) -> str:
+        """
+        Returns a string representation of the layer.
+        """
+        return f"Layer(Neurons:{[neuron for neuron in self.neurons]}, Activation:{self.activation})"
+
+    def initialize_neurons(self, input_dim:int) -> None:
         """
         Initializes the neurons of the layer.
         :param input_dim: The size of the input to the neuron.
         """
         self.neurons = [Neuron(input_dim, self.activation) for _ in range(self.units)]
 
-    def forward(self, input_vector):
+    def forward(self, input_vector:np.ndarray) -> np.ndarray:
         """
         Performs the forward pass of the layer.
         :param input_vector: The input to the neuron(s).
@@ -43,7 +50,7 @@ class Layer:
         self.output = np.array([neuron.forward(input_vector) for neuron in self.neurons])
         return self.output
 
-    def set_input_size_from_previous_layer(self, prev_layer_units):
+    def set_input_size_from_previous_layer(self, prev_layer_units:int) -> None:
         """
         Sets the size of the input to the number of neurons in the previous layer.
         Only used if no input_size is specified.

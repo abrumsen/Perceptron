@@ -4,6 +4,7 @@ class Activation:
     """
     A wrapper class for activation functions and their derivatives.
     """
+
     def __init__(self, name:str, **kwargs:float) -> None:
         """
         Initialize an activation function.

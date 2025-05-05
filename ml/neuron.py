@@ -1,17 +1,19 @@
 import numpy as np
 from ml.activation import Activation
 
+
 class Neuron:
     """
     A class representing a single neuron in a neural network layer.
     """
+
     def __init__(self, input_size: int, activation: Activation) -> None:
         """
         Initializes a new neuron.
         :param input_size: The size of the input to the neuron.
         :param activation: The activation function of the neuron.
         """
-        self.weights = np.random.normal(0,1,input_size)
+        self.weights = np.random.normal(0, 1, input_size)
         self.bias = np.random.randn()
         self.activation = activation
         self.a = None
@@ -19,6 +21,9 @@ class Neuron:
         self.inputs = None
 
     def __repr__(self) -> str:
+        """
+        Returns a string representation of the neuron.
+        """
         return f"Neuron(weights={self.weights})"
 
     def forward(self, inputs: np.ndarray) -> float:
