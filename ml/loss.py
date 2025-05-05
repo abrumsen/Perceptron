@@ -30,21 +30,21 @@ class Loss:
         return self.gradient(y_true, y_pred)
 
     @staticmethod
-    def mse(y_true: np.ndarray | float, y_pred: np.ndarray | float) -> np.ndarray | float:
+    def mse_classification(y_true: np.ndarray | float, y_pred: np.ndarray | float) -> np.ndarray | float:
         """
-        Mean Squared Error (MSE) loss function.
+        Mean Squared Error (MSE) loss function for classification.
         :param y_true: Ground truth labels.
         :param y_pred: Predicted values.
         :return: Mean squared error between y_true and y_pred.
         """
-        return np.mean((y_true - y_pred) ** 2)
+        return np.mean(0.5 * (y_true - y_pred) ** 2)
 
     @staticmethod
-    def mse_gradient(y_true: np.ndarray | float, y_pred: np.ndarray | float) -> np.ndarray | float:
+    def mse_regression(y_true: np.ndarray | float, y_pred: np.ndarray | float) -> np.ndarray | float:
         """
-        Gradient of Mean Squared Error (MSE).
+        Mean Squared Error (MSE) loss function for regression.
         :param y_true: Ground truth labels.
         :param y_pred: Predicted values.
         :return: Gradient of MSE with respect to predictions.
         """
-        return 2 * (y_pred - y_true) / y_true.size
+        return np.mean(0.5 * (y_pred - y_true) ** 2)
