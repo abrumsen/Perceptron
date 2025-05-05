@@ -20,6 +20,9 @@ class Optimizer:
             case _:
                 raise ValueError(f"Unsupported algorithm: {self.algorithm_name}")
 
+        if self.mode == "regression" and self.algorithm == "simple":
+            raise ValueError(f"Simple optimizer only supports 'classification' mode")
+
     def __repr__(self) -> str:
         return f"Optimizer(algorithm={self.algorithm_name}, learning_rate={self.learning_rate}, mode={self.mode})"
 
