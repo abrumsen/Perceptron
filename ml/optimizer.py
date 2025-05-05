@@ -2,13 +2,14 @@ class Optimizer:
     """
     A class that defines different learning algorithms and their methods.
     """
-    def __init__(self, algorithm_name:str, learning_rate:float, mode:str) -> None:
+    def __init__(self, algorithm_name:str, learning_rate:float, mode:str, metrics) -> None:
         """
         Initializes the optimizer.
         """
         self.algorithm_name = algorithm_name.lower()
         self.learning_rate = learning_rate
         self.mode = mode
+        self.metrics = metrics
 
         match self.algorithm_name:
             case "simple":

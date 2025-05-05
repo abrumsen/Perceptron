@@ -21,6 +21,7 @@ class Layer:
         self.input_size = input_size  # Only required for first layer
         self.neurons = []
         self.output = None
+        self.inputs = None
 
         # Create activation object with kwargs
         self.activation = Activation(activation, **activation_kwargs)
@@ -47,8 +48,26 @@ class Layer:
         :param input_vector: The input to the neuron(s).
         :return: The output of the neuron(s).
         """
+        self.inputs = input_vector
         self.output = np.array([neuron.forward(input_vector) for neuron in self.neurons])
         return self.output
+
+    def retropropagation(self, error_signal, learning_rate):
+        """
+        Performs the backward pass of the layer.
+        :param error_signal: The error signal of the neuron(s).
+        :param learning_rate: The learning rate.
+        :return: accumulated error signal for previous layer.
+        """
+        prev_error = np.zeros_like(self.inputs)
+
+        for i, neuron in enumerate(self.neurons):
+            # Each neuron receives its own error signal
+            delta = neuron.retropropagation(error_signal[i], learning_rate)
+            # Accumulate error signals for previous layer
+            prev_error += delta
+
+        return prev_error
 
     def set_input_size_from_previous_layer(self, prev_layer_units:int) -> None:
         """

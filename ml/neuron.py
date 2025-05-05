@@ -16,8 +16,8 @@ class Neuron:
         self.weights = np.random.normal(0, 1, input_size)
         self.bias = np.random.randn()
         self.activation = activation
-        self.a = None
-        self.z = None
+        self.a = None # Activated value
+        self.z = None # Potential
         self.inputs = None
 
     def __repr__(self) -> str:
@@ -37,3 +37,20 @@ class Neuron:
         # Apply activation function
         self.a = self.activation(self.z)
         return self.a
+
+    def retropropagation(self, error, learning_rate):
+        """
+        Perform the backward pass through the neuron.
+        :param error: The error signal of the neuron.
+        :param learning_rate: The learning rate of the neuron.
+        :return: .
+        """
+        # Calculate delta (error signal for this neuron)
+        delta = error * self.activation.derivative(self.z)
+        # Calculate signal for previous layer
+        for_prev_layer = self.weights.copy() * delta
+        # Update weights and bias
+        self.weights += learning_rate * delta * self.inputs
+        self.bias += learning_rate * delta
+
+        return for_prev_layer

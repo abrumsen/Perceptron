@@ -1,8 +1,6 @@
 import numpy as np
 from typing import List
 from ml.layer import Layer
-from ml.history import History
-from ml.optimizer import Optimizer
 
 
 class Model:
@@ -10,17 +8,13 @@ class Model:
     A class that represents a feedforward neural network model. It is made up of one or more layers.
     """
 
-    def __init__(self, layers: List["Layer"], mode:str) -> None:
+    def __init__(self, layers: List["Layer"]) -> None:
         """
         Initializes the model.
         :param layers: A list of Layer objects.
-        :param mode: One of "classification" or "regression".
         """
-        self.optimizer = None
         self.layers = layers
         self._connect_layers()
-        self.mode = mode.lower()
-        assert mode in ["classification", "regression"], "mode must be either 'classification' or 'regression'"
 
     def __repr__(self) -> str:
         """
@@ -40,17 +34,37 @@ class Model:
             if self.layers[i].input_size is None:
                 self.layers[i].set_input_size_from_previous_layer(self.layers[i - 1].units)
 
-    def compile(self, algorithm_name, learning_rate, mode):
-        """
-        Defines the model's training algorithm, learning rate & metrics.
-        """
-        self.optimizer = Optimizer(algorithm_name, learning_rate, mode)
-
-    def fit(self, x_train: np.ndarray, y_train: np.ndarray, epochs:int, verbose=0) -> History:
+    def fit(self, x_train: np.ndarray, y_train: np.ndarray, learning_rate, threshold, epochs:int):
         """
         Trains the model.
+        :param x_train: Training data.
+        :param y_train: Training labels.
+        :param learning_rate: Learning rate.
+        :param threshold:
+        :param epochs: Number of training epochs.
         """
-        pass
+        for epoch in range(epochs):
+            for idx,iteration in enumerate(x_train):
+                iteration = np.array(iteration)
+                y_pred = self.forward(iteration)
+                error = y_train[idx] - y_pred
+                self.retropropagation(error, learning_rate)
+            # Calculate MSE with new weights.
+            errors = np.array([])
+            predictions = np.array([])
+            for iteration in x_train:
+                y_pred = self.forward(iteration)
+                error = y_train - y_pred
+                errors = np.append(errors, error)
+                predictions = np.append(predictions, y_pred)
+            mse = np.mean(0.5 * errors ** 2)
+            # Training exit condition
+            if mse < threshold or (predictions.all() == y_train.all()):
+                print(f"Training complete after {epoch + 1} epochs.")
+                break
+            if epoch % 20 == 0:
+                print(f"Epoch :{epoch + 1}, MSE: {mse:.4f}")
+        print(f"Training stopped after {epochs} epochs.")
 
     def forward(self, input_vector: np.ndarray) -> np.ndarray:
         """
@@ -63,11 +77,14 @@ class Model:
             output = layer.forward(output)
         return output
 
-    def backward(self):
+    def retropropagation(self, error, learning_rate):
         """
         Performs a backward pass through the entire model.
+        :param error: Calculated error.
+        :param learning_rate: Learning rate.
         """
-        pass
+        for layer in reversed(self.layers):
+            error = layer.retropropagation(error, learning_rate)
 
     def save(self, path: str) -> None:
         """
