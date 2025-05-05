@@ -1,6 +1,8 @@
 import numpy as np
 from typing import List
 from ml.layer import Layer
+from ml.history import History
+from ml.optimizer import Optimizer
 
 
 class Model:
@@ -34,6 +36,18 @@ class Model:
             if self.layers[i].input_size is None:
                 self.layers[i].set_input_size_from_previous_layer(self.layers[i - 1].units)
 
+    def compile(self, learning_algorithm:Optimizer):
+        """
+        Defines the model's training algorithm, learning rate & metrics.
+        """
+        pass
+
+    def fit(self, x_train: np.ndarray, y_train: np.ndarray, epochs:int, verbose=0) -> History:
+        """
+        Trains the model.
+        """
+        pass
+
     def forward(self, input_vector: np.ndarray) -> np.ndarray:
         """
         Performs a forward pass through the entire model.
@@ -44,3 +58,23 @@ class Model:
         for layer in self.layers:
             output = layer.forward(output)
         return output
+
+    def backward(self):
+        """
+        Performs a backward pass through the entire model.
+        """
+        pass
+
+    def save(self, path: str) -> None:
+        """
+        Saves the model to a file.
+        :param path: Path to save the model to.
+        """
+        pass
+
+    def load(self, path: str) -> None:
+        """
+        Loads the model from a file.
+        :param path: Path to load the model from.
+        """
+        pass
