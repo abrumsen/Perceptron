@@ -10,12 +10,14 @@ class Model:
     A class that represents a feedforward neural network model. It is made up of one or more layers.
     """
 
-    def __init__(self, layers: List["Layer"]) -> None:
+    def __init__(self, layers: List["Layer"], mode:str) -> None:
         """
         Initializes the model.
         :param layers: A list of Layer objects.
+        :param mode: One of "classification" or "regression".
         """
         self.layers = layers
+        self.mode = mode
         self._connect_layers()
 
     def __repr__(self) -> str:
