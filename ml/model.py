@@ -16,6 +16,7 @@ class Model:
         :param layers: A list of Layer objects.
         :param mode: One of "classification" or "regression".
         """
+        self.optimizer = None
         self.layers = layers
         self._connect_layers()
         self.mode = mode.lower()
@@ -39,11 +40,11 @@ class Model:
             if self.layers[i].input_size is None:
                 self.layers[i].set_input_size_from_previous_layer(self.layers[i - 1].units)
 
-    def compile(self, learning_algorithm:Optimizer):
+    def compile(self, algorithm_name, learning_rate, mode):
         """
         Defines the model's training algorithm, learning rate & metrics.
         """
-        pass
+        self.optimizer = Optimizer(algorithm_name, learning_rate, mode)
 
     def fit(self, x_train: np.ndarray, y_train: np.ndarray, epochs:int, verbose=0) -> History:
         """
