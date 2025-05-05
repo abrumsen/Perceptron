@@ -17,8 +17,9 @@ class Model:
         :param mode: One of "classification" or "regression".
         """
         self.layers = layers
-        self.mode = mode
         self._connect_layers()
+        self.mode = mode.lower()
+        assert mode in ["classification", "regression"], "mode must be either 'classification' or 'regression'"
 
     def __repr__(self) -> str:
         """

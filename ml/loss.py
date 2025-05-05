@@ -4,30 +4,26 @@ class Loss:
     """
     A wrapper class for loss functions and their gradients.
     """
-    def __init__(self, name: str, **kwargs: float) -> None:
+    def __init__(self, name: str) -> None:
         """
         Initialize a loss function.
         :param name: The name of the loss function. Supported: "mse"
-        :param kwargs: Keyword arguments passed to the loss function.
         """
         self.name = name.lower()
-        self.params = kwargs
 
         match self.name:
-            case "mse":
-                self.func = self.mse
-                self.gradient = self.mse_gradient
+            case "mse_regression":
+                self.func = self.mse_regression
+            case "mse_classification":
+                self.func = self.mse_classification
             case _:
                 raise ValueError(f"Unsupported loss function: {name}")
 
     def __repr__(self) -> str:
-        return f"Loss(name='{self.name}', params={self.params})"
+        return f"Loss(name='{self.name}'"
 
     def __call__(self, y_true: np.ndarray | float, y_pred: np.ndarray | float) -> np.ndarray | float:
         return self.func(y_true, y_pred)
-
-    def gradient_func(self, y_true: np.ndarray | float, y_pred: np.ndarray | float) -> np.ndarray | float:
-        return self.gradient(y_true, y_pred)
 
     @staticmethod
     def mse_classification(y_true: np.ndarray | float, y_pred: np.ndarray | float) -> np.ndarray | float:
