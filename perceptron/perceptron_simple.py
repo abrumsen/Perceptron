@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 
 from perceptron import Perceptron
+from utils.history import History
 
 
 class PerceptronSimple(Perceptron):
@@ -33,12 +34,13 @@ class PerceptronSimple(Perceptron):
         """
         self.weights += self.learning_rate * error * x
 
-    def train(self, training_data: pd.DataFrame) -> int:
+    def train(self, training_data: pd.DataFrame) -> History:
         """
         Trains the perceptron with the given training data using the basic perceptron algorithm.
         :param training_data: The training data dataframe.
         :return: 1 if training was successful, 0 if not.
         """
+        history = History()
         for epoch in range(self.epochs):
             errors = 0
             for _, row in training_data.iterrows():
@@ -49,6 +51,22 @@ class PerceptronSimple(Perceptron):
                     self.correct(error, row["inputs"])
             if errors == 0:
                 print(f"Training complete for {epoch + 1} epochs")
-                return 1
+                return history
         print(f"Training stopped after {self.epochs} epochs")
-        return 0
+        return history
+
+    def export_neuron(self, path: str) -> None:
+        """
+        Export the perceptron weights to a csv file.
+        :param path: The path to save the weights to.
+        """
+        columns = [f"w{i}" for i in range(len(self.weights))]
+        df = pd.DataFrame(self.weights, columns=columns)
+        df.to_csv(path, index=False)
+
+    def import_neuron(self, path: str) -> None:
+        """
+        Import the perceptron weights.
+        :param path: The path to load the weights from.
+        """
+        pass
