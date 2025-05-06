@@ -1,7 +1,7 @@
 import numpy as np
 from typing import List
 
-from ml.history import History
+from utils.history import History
 from ml.layer import Layer
 
 
