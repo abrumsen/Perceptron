@@ -110,7 +110,7 @@ class PerceptronGradient(Perceptron):
         return 0
 
 
-    def mode_choose(self, training_data: pd.DataFrame, seuil: float, mode: bool) -> int:
+    def mode_choose(self, training_data: pd.DataFrame, seuil: float, mode: str) -> int:
         """
         Chooses the training mode for the perceptron: classification or regression.
         Executes the corresponding training method based on the specified mode.
@@ -120,7 +120,9 @@ class PerceptronGradient(Perceptron):
                      True for classification, False for regression.
         :return: 1 if training is successful, 0 if it stops after all epochs.
         """
-        if mode:
+        if mode == "classification":
             return self.classification_train(training_data, seuil)
-        else:
+        elif mode == "regression":
             return self.regression_train(training_data, seuil)
+        else:
+            print("Invalid mode")
