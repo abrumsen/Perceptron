@@ -39,7 +39,7 @@ def p_data_to_dataframe(iteration:int, weights:list, variables:list, obtained_va
     return pd.DataFrame(p_data)
 
 
-def load_dataframe_from_file(file_name: str, nbr_labels: int):
+def load_dataframe_from_file(file_name: str, nbr_labels: int=1):
     """
     Load data from a CSV file and return it as a DataFrame with 'input' and 'label(s)' columns.
 
