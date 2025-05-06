@@ -54,13 +54,13 @@ def load_dataframe_from_file(file_name: str, nbr_labels: int=1):
     labels = df.iloc[:, -nbr_labels:].values
 
     result = pd.DataFrame({
-        "input": [np.array(row) for row in inputs],
-        "labels": [np.array(row) for row in labels]
+        "inputs": [np.array(row) for row in inputs],
+        "label": [np.array(row) for row in labels]
     })
 
     if nbr_labels == 1:
-        result["label"] = result["labels"].apply(lambda x: x[0])
-        return result[["input", "label"]]
+        result["label"] = result["label"].apply(lambda x: x[0])
+        return result[["inputs", "label"]]
 
     return result
 def generate_random_data(file_path:str, iteration_number):
@@ -85,5 +85,5 @@ def generate_random_data(file_path:str, iteration_number):
 
 
 if __name__ == "__main__":
-    df = load_dataframe_from_file("../datasets/table_4_14.csv", nbr_labels=1)
+    df = load_dataframe_from_file("../datasets/table_4_14.csv", nbr_labels=3)
     print(df)
