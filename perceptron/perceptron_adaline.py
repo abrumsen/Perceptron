@@ -56,6 +56,7 @@ class PerceptronAdaline(Perceptron):
 
             history.log(epoch=epoch+1, mse=mean_quad_error, accuracy=accuracy, weights=self.weights.copy())
 
+           # if mean_quad_error < seuil or accuracy == 1.0:
             if mean_quad_error < seuil :
                 print(f"Training complete after {epoch + 1} epochs with MSE={mean_quad_error} & weights={self.weights} & prediction={predictions_epoch}")
 
