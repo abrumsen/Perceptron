@@ -49,6 +49,8 @@ class PerceptronSimple(Perceptron):
                 if error != 0:
                     errors += 1
                     self.correct(error, row["inputs"])
+            accuracy = (len(training_data) - errors) / len(training_data)
+            history.log(epoch=epoch,weights=self.weights.copy(), accuracy=accuracy)
             if errors == 0:
                 print(f"Training complete for {epoch + 1} epochs")
                 return history
