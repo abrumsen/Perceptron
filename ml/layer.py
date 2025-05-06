@@ -52,10 +52,10 @@ class Layer:
         self.output = np.array([neuron.forward(input_vector) for neuron in self.neurons])
         return self.output
 
-    def retropropagation(self, error_signal, learning_rate):
+    def retropropagation(self, error: np.ndarray, learning_rate: float) -> np.ndarray:
         """
         Performs the backward pass of the layer.
-        :param error_signal: The error signal of the neuron(s).
+        :param error: The error of the neuron(s).
         :param learning_rate: The learning rate.
         :return: accumulated error signal for previous layer.
         """
@@ -63,7 +63,7 @@ class Layer:
 
         for i, neuron in enumerate(self.neurons):
             # Each neuron receives its own error signal
-            delta = neuron.retropropagation(error_signal[i], learning_rate)
+            delta = neuron.retropropagation(error[i], learning_rate)
             # Accumulate error signals for previous layer
             prev_error += delta
 

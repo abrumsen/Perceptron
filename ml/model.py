@@ -34,7 +34,7 @@ class Model:
             if self.layers[i].input_size is None:
                 self.layers[i].set_input_size_from_previous_layer(self.layers[i - 1].units)
 
-    def fit(self, x_train: np.ndarray, y_train: np.ndarray, learning_rate, threshold, epochs:int):
+    def fit(self, x_train: np.ndarray, y_train: np.ndarray, learning_rate: float, threshold: float, epochs:int):
         """
         Trains the model.
         :param x_train: Training data.
@@ -66,6 +66,7 @@ class Model:
             if epoch % 20 == 0:
                 print(f"Epoch :{epoch + 1}, MSE: {mse:.4f}")
         print(f"Training stopped after {epochs} epochs.")
+        return False
 
     def forward(self, input_vector: np.ndarray) -> np.ndarray:
         """
@@ -78,7 +79,7 @@ class Model:
             output = layer.forward(output)
         return output
 
-    def retropropagation(self, error, learning_rate):
+    def retropropagation(self, error: np.ndarray, learning_rate: float) -> None:
         """
         Performs a backward pass through the entire model.
         :param error: Calculated error.

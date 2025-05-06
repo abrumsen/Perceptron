@@ -38,7 +38,7 @@ class Neuron:
         self.a = self.activation(self.z)
         return self.a
 
-    def retropropagation(self, error, learning_rate):
+    def retropropagation(self, error: float, learning_rate:float) -> np.ndarray:
         """
         Perform the backward pass through the neuron.
         :param error: The error signal of the neuron.
