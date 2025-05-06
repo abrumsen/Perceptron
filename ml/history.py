@@ -32,6 +32,3 @@ class History:
 
     def __str__(self):
         return str(self.latest())
-# accuracy, weights, mse
-# we will plot each quarter of training
-# montrer ligne décision / régression lorsque données en 2D (input size on l1 <=2)
