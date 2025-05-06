@@ -47,7 +47,7 @@ def load_dataframe_from_file(file_name:str="data.csv"):
     dataf.insert(0, "x0", 1)
     dataf.columns = [*dataf.columns[:-1], "label"]
     dataf["inputs"] = dataf.iloc[:, :-1].values.tolist()
-    return dataf[["input", "labels"]]
+    return dataf[["inputs", "label"]]
 
 def generate_random_data(file_path:str, iteration_number):
     """
