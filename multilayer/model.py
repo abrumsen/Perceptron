@@ -90,7 +90,7 @@ class Model:
             mse = np.mean(0.5 * errors ** 2)
             history.log(epoch=epoch, mse=mse, accuracy=np.mean(predictions.round() == y_train))
             # Training exit condition
-            if mse < threshold or (predictions.all() == y_train.all()):
+            if mse < threshold:
                 print(f"Training complete after {epoch + 1} epochs.")
                 return history
             if epoch % 20 == 0 and verbose:
