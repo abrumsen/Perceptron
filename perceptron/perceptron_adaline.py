@@ -3,6 +3,8 @@ import pandas as pd
 from numpy import ndarray
 
 from perceptron import Perceptron
+from utils.history import History
+
 
 class PerceptronAdaline(Perceptron):
     def __init__(self, input_size:int, learning_rate: float=0.3, epochs: int=1000)-> None:
@@ -15,11 +17,9 @@ class PerceptronAdaline(Perceptron):
         return array_s
 
     def predict(self, data: np.ndarray) -> ndarray:
-        # return self.activation_function(np.dot(self.weights, data))
-        return np.dot(self.weights, data)
+        return np.dot(data,self.weights)
 
     def round_predict(self, data: np.ndarray) -> ndarray:
-        # return self.activation_function(np.dot(self.weights, data))
         array = np.dot(self.weights, data)
         return self.activation_function(array)
 
@@ -29,44 +29,37 @@ class PerceptronAdaline(Perceptron):
 
     @staticmethod
     def quadratic_error(expected_value:np.array, actual_value:np.array):
-        error = (expected_value - actual_value)**2
-        error_sum = 0
-        for e in error:
-            error_sum += e
-        return 0.5*error_sum
+        return 0.5*np.sum((expected_value - actual_value)**2)
 
     def mean_quadratic_error(self, expected_value:np.array, inputs:np.ndarray) -> float:
-        output_recalculation = np.array([])
-        for inpt in inputs:
-            prediction = self.predict(inpt)
-            output_recalculation = np.append(output_recalculation, prediction)
+        predictions = self.predict(inputs)
+        return self.quadratic_error(expected_value, predictions)/len(predictions)
 
-        quadratic_error = self.quadratic_error(expected_value, output_recalculation)
-        return quadratic_error/len(output_recalculation)
-
-    def train(self, dataset: pd.DataFrame, seuil: float) -> bool:
-        training_data = dataset["inputs"].values
+    def train_classification(self, dataset: pd.DataFrame, seuil: float) -> History:
+        training_data = np.stack(dataset["inputs"].values)
         expected_values = dataset["label"].values
+        history = History()
         for epoch in range(self.epochs):
+            predictions_epoch = np.zeros_like(expected_values, dtype=float)
 
-            obtained_values = np.array([])
             for i in range(len(training_data)):
-                data = training_data[i]
-                expected_v = expected_values[i]
-                prediction = self.predict(data)
-                error = expected_v - prediction
-                self.correct_weights(expected_v, prediction, data)
-                obtained_values = np.append(obtained_values,prediction)
-            mean_quad_error = self.mean_quadratic_error(expected_values, training_data)
-            if mean_quad_error < seuil:
-                print(
-                    f"Training complete for {epoch + 1} epochs, epochs with quad error {mean_quad_error} and error {error}\nw0 : {self.weights[0]}\nw1 : {self.weights[1]}\nw2 : {self.weights[2]}\nThe obtained values: {self.activation_function(obtained_values)}, the expected values: {expected_values}")
-                # print(f"Training complete for {epoch + 1} epochs, epochs with quad error {mean_quad_error} and error {error}\nw0 : {self.weights[0]}\nw1 : {self.weights[1]}\nw2 : {self.weights[2]}\nThe obtained values: {obtained_values}, the expected values: {expected_values}")
-                return True
-        # print(f"Training uncomplete after {self.epochs} epochs, epochs with error {mean_quad_error} and error {error}\nw0 : {self.weights[0]}\nw1 : {self.weights[1]}\nw2 : {self.weights[2]}\nThe obtained values: {obtained_values}, the expected values: {expected_values}")
-        print(f"Training uncomplete after {self.epochs} epochs, epochs with quad error {mean_quad_error} and error {error}\nw0 : {self.weights[0]}\nw1 : {self.weights[1]}\nw2 : {self.weights[2]}\nThe obtained values: {self.activation_function(obtained_values)}, the expected values: {expected_values}")
-        return False
+                x_i = training_data[i]
+                y_i = expected_values[i]
 
+                prediction = self.predict(x_i)
+                error = y_i - prediction
+                self.weights += self.learning_rate * error * x_i
+                predictions_epoch[i] = prediction
+
+            mean_quad_error = self.mean_quadratic_error(expected_values, training_data)
+            accuracy = np.mean(self.activation_function(predictions_epoch) == expected_values)
+
+            history.log(epoch=epoch+1, mse=mean_quad_error, accuracy=accuracy)
+
+            if mean_quad_error < seuil or accuracy == 1.0:
+                return history
+
+        return history
 
 
 
