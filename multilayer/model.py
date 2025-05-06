@@ -88,9 +88,10 @@ class Model:
             # Calculate MSE with new weights.
             predictions, errors = self._evaluate_batch(x_train, y_train, learning_rate, False)
             mse = np.mean(0.5 * errors ** 2)
-            history.log(epoch=epoch, mse=mse, accuracy=np.mean(predictions.round() == y_train))
+            predictions_rounded = predictions.round()
+            history.log(epoch=epoch, mse=mse, accuracy=np.mean(predictions == y_train))
             # Training exit condition
-            if mse < threshold or (predictions.all() == y_train.all()):
+            if mse < threshold:
                 print(f"Training complete after {epoch + 1} epochs.")
                 return history
             if epoch % 20 == 0 and verbose:
