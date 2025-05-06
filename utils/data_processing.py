@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import random
+import numpy as np
 
 def store_data(dataframe:pd.DataFrame, file_path:str):
     """
@@ -46,7 +47,7 @@ def load_dataframe_from_file(file_name:str="data.csv"):
     dataf = pd.read_csv(file_name, sep=",", header=None)
     dataf.insert(0, "x0", 1)
     dataf.columns = [*dataf.columns[:-1], "label"]
-    dataf["inputs"] = dataf.iloc[:, :-1].values.tolist()
+    dataf["inputs"] = [np.array(row) for row in dataf.iloc[:, :-1].values]
     return dataf[["inputs", "label"]]
 
 def generate_random_data(file_path:str, iteration_number):
@@ -71,4 +72,6 @@ def generate_random_data(file_path:str, iteration_number):
 
 
 if __name__ == "__main__":
-    print(load_dataframe_from_file("../datasets/table_2_3.csv"))
+    df = load_dataframe_from_file("../datasets/table_2_3.csv")
+    print(df)
+    print(type(df["inputs"].iloc[0]))
