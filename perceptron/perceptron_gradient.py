@@ -35,26 +35,14 @@ class PerceptronGradient(Perceptron):
 
 
     @staticmethod
-    def error_classification(array_y:np.ndarray, array_s:np.ndarray) -> np.ndarray:
-        """
-        Computes the error for a single epoch of training in mode classification.
-        :param array_y: The predicted outputs from the perceptron.
-        :param array_s: The actual outputs after applying the activation function.
-        :return: The error value for each sample in the dataset.
-        """
-        array_error = 0.5*((array_y - array_s)**2)
-        return array_error
-
-
-    @staticmethod
-    def error_regression(array_y:np.ndarray, array_d: np.ndarray) -> np.ndarray:
+    def error(array_y:np.ndarray, array_d: np.ndarray) -> np.ndarray:
         """
         Computes the error for a single epoch of training in mode regression.
         :param array_y: The predicted outputs from the perceptron.
         :param array_d The actual outputs.
         :return: The error value for each sample in the dataset.
         """
-        array_error = 0.5*(array_d - array_y)**2
+        array_error = 0.5*(array_y - array_d)**2
         return array_error
 
 
@@ -81,10 +69,10 @@ class PerceptronGradient(Perceptron):
         for epoch in range(self.epochs):
             y = self.predict(training_data)
             s = self.activation_function(y)
-            error = self.error_classification(training_data["label"], y)
-            print(np.mean(error))
+            d = training_data["label"].values
+            error = self.error(y, d)
             history.log(epoch=epoch, mse=np.mean(error), accuracy=np.mean(s == training_data["label"].values))
-            if np.mean(error) <= seuil and (s == training_data["label"].values).all():
+            if np.mean(error) <= seuil or (s == training_data["label"].values).all():
                 print(f"Training complete after {epoch + 1} epochs.")
                 return history
             self.correct(y, training_data["label"], training_data["inputs"])
@@ -104,9 +92,8 @@ class PerceptronGradient(Perceptron):
         for epoch in range(self.epochs):
             y = self.predict(training_data)
             d = training_data["label"].values
-            error = self.error_regression(y,d)
+            error = self.error(y,d)
             history.log(epoch=epoch, mse=np.mean(error))
-            print(np.mean(error))
             if np.mean(error) <= seuil:
                 print(f"Training complete after {epoch + 1} epochs.")
                 return history
