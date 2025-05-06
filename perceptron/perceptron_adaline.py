@@ -35,7 +35,7 @@ class PerceptronAdaline(Perceptron):
         predictions = self.predict(inputs)
         return self.quadratic_error(expected_value, predictions)/len(predictions)
 
-    def train_classification(self, dataset: pd.DataFrame, seuil: float) -> History:
+    def train_classification(self, dataset: pd.DataFrame, seuil: float, until_no_error: bool=False) -> History:
         training_data = np.stack(dataset["inputs"].values)
         expected_values = dataset["label"].values
         history = History()
@@ -56,7 +56,11 @@ class PerceptronAdaline(Perceptron):
 
             history.log(epoch=epoch+1, mse=mean_quad_error, accuracy=accuracy, weights=self.weights.copy())
 
-           # if mean_quad_error < seuil or accuracy == 1.0:
+            if until_no_error and accuracy == 1.0:
+                print(
+                    f"Training complete after {epoch + 1} epochs with MSE={mean_quad_error} & weights={self.weights} & prediction={predictions_epoch}")
+
+                return history
             if mean_quad_error < seuil :
                 print(f"Training complete after {epoch + 1} epochs with MSE={mean_quad_error} & weights={self.weights} & prediction={predictions_epoch}")
 
