@@ -1,5 +1,5 @@
 import numpy as np
-from ml.activation import Activation
+from multilayer.activation import Activation
 
 
 class Neuron:

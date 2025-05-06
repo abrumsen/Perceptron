@@ -6,9 +6,10 @@ Implementing different types of perceptrons from scratch without deep learning l
 ```bash
 .
 ├── datasets            # Training and validation data
-├── ml                  # Core ML logic
+├── multilayer          # Multilayer model classes
 ├── notebooks           # Jupyter notebooks for demos/experiments
 ├── LICENSE
+├── perceptron          # Simple, Gradient, ADALINE & Monolayer model classes
 ├── README.md           # Documentation
 ├── requirements.txt    # Dependencies
 ├── tests               # Unit tests

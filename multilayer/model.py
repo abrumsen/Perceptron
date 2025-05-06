@@ -2,7 +2,7 @@ import numpy as np
 from typing import List
 
 from utils.history import History
-from ml.layer import Layer
+from multilayer.layer import Layer
 
 
 class Model:

@@ -1,6 +1,6 @@
 import numpy as np
-from ml.neuron import Neuron
-from ml.activation import Activation
+from multilayer.neuron import Neuron
+from multilayer.activation import Activation
 
 
 class Layer:
