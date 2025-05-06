@@ -1,5 +1,7 @@
 import numpy as np
 from typing import List
+
+from ml.history import History
 from ml.layer import Layer
 
 
@@ -70,7 +72,7 @@ class Model:
             errors = np.append(errors, error)
         return predictions, errors
 
-    def fit(self, x_train: np.ndarray, y_train: np.ndarray, learning_rate: float, threshold: float, epochs:int, verbose: bool=False) -> bool:
+    def fit(self, x_train: np.ndarray, y_train: np.ndarray, learning_rate: float, threshold: float, epochs:int, verbose: bool=False) -> History:
         """
         Trains the model.
         :param x_train: Training data.
@@ -80,19 +82,21 @@ class Model:
         :param epochs: Number of training epochs.
         :param verbose: Verbosity.
         """
+        history = History()
         for epoch in range(epochs):
             self._evaluate_batch(x_train, y_train, learning_rate, True)
             # Calculate MSE with new weights.
             predictions, errors = self._evaluate_batch(x_train, y_train, learning_rate, False)
             mse = np.mean(0.5 * errors ** 2)
+            history.log(epoch=epoch, mse=mse, accuracy=np.mean(predictions.round() == y_train))
             # Training exit condition
             if mse < threshold or (predictions.all() == y_train.all()):
                 print(f"Training complete after {epoch + 1} epochs.")
-                return True
+                return history
             if epoch % 20 == 0 and verbose:
                 print(f"Epoch :{epoch + 1}, MSE: {mse:.4f}")
         print(f"Training stopped after {epochs} epochs.")
-        return False
+        return history
 
     def save(self, path: str) -> None:
         """
