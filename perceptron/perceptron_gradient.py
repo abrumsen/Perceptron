@@ -42,7 +42,7 @@ class PerceptronGradient(Perceptron):
         :param array_s: The actual outputs after applying the activation function.
         :return: The error value for each sample in the dataset.
         """
-        array_error = 0.5*(array_y - array_s)**2
+        array_error = 0.5*((array_y - array_s)**2)
         return array_error
 
 
@@ -81,7 +81,8 @@ class PerceptronGradient(Perceptron):
         for epoch in range(self.epochs):
             y = self.predict(training_data)
             s = self.activation_function(y)
-            error = self.error_classification(y, s)
+            error = self.error_classification(training_data["label"], y)
+            print(np.mean(error))
             history.log(epoch=epoch, mse=np.mean(error), accuracy=np.mean(s == training_data["label"].values))
             if np.mean(error) <= seuil and (s == training_data["label"].values).all():
                 print(f"Training complete after {epoch + 1} epochs.")
@@ -105,6 +106,7 @@ class PerceptronGradient(Perceptron):
             d = training_data["label"].values
             error = self.error_regression(y,d)
             history.log(epoch=epoch, mse=np.mean(error))
+            print(np.mean(error))
             if np.mean(error) <= seuil:
                 print(f"Training complete after {epoch + 1} epochs.")
                 return history
