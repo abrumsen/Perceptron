@@ -43,7 +43,9 @@ def load_dataframe_from_file(file_name:str="data.csv"):
     :param file_name: Name of the file containing the data to be loaded.
     :return: returns a Pandas Dataframe
     """
-    return pd.read_csv(file_name, index_col=0, sep=";")
+    dataf = pd.read_csv(file_name, sep=",", header=None)
+    dataf.insert(0, "x0", 1)
+    return dataf
 
 def generate_random_data(file_path:str, iteration_number):
     """
@@ -67,3 +69,6 @@ def generate_random_data(file_path:str, iteration_number):
 
 
 
+df = pd.read_csv("../datasets/table_4_12.csv",sep=",", header=None)
+df.insert(0, "x0", 1)
+print(df)
