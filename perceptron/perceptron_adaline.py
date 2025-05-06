@@ -54,13 +54,11 @@ class PerceptronAdaline(Perceptron):
             mean_quad_error = self.mean_quadratic_error(expected_values, training_data)
             accuracy = np.mean(self.activation_function(predictions_epoch) == expected_values)
 
-            history.log(epoch=epoch, mse=mean_quad_error, accuracy=accuracy)
+            history.log(epoch=epoch+1, mse=mean_quad_error, accuracy=accuracy)
 
             if mean_quad_error < seuil or accuracy == 1.0:
-                print(f"Training complete at epoch {epoch + 1}, mse {mean_quad_error}")
                 return history
 
-        print(f"Training incomplete after {self.epochs} epochs")
         return history
 
 
