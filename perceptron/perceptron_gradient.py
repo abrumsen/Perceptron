@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 
 from perceptron import Perceptron
+from utils.history import History
 
 class PerceptronGradient(Perceptron):
     def __init__(self, input_size: int, learning_rate: float = 0.3, epochs: int = 1000) -> None:
@@ -68,25 +69,26 @@ class PerceptronGradient(Perceptron):
         self.weights += self.learning_rate * np.dot(array_error_to_correct, array_x)
 
 
-    def classification_train(self, training_data: pd.DataFrame, seuil: float) -> int:
+    def classification_train(self, training_data: pd.DataFrame, seuil: float) -> History:
         """
         Trains the perceptron with classification using the given training data.
         Stops when the error is below the specified threshold or after completing all epochs.
         :param training_data: A DataFrame containing the training data with inputs and labels.
         :param seuil: The threshold for error to stop training.
-        :return: 1 if training is successful, 0 if it stops after all epochs.
+        :return: history if training is successful, history if it stops after all epochs.
         """
+        history = History()
         for epoch in range(self.epochs):
             y = self.predict(training_data)
             s = self.activation_function(y)
             error = self.error_classification(y, s)
+            history.log(epoch=epoch, mse=np.mean(error), accuracy=np.mean(y.round() == s))
             if np.mean(error) <= seuil and (s == training_data["label"].values).all():
-                print(
-                    f"Training complete for {epoch + 1} epochs with error {np.mean(error)}\nw0 : {self.weights[0]}\nw1 : {self.weights[1]}\nw2 : {self.weights[2]}")
-                return 1
+                print(f"Training complete after {epoch + 1} epochs.")
+                return history
             self.correct(y, training_data["label"], training_data["inputs"])
-        print(f"Training stopped after {self.epochs} epochs with error {np.mean(error)}")
-        return 0
+        print(f"Training stopped after {epoch} epochs with error {np.mean(error)}")
+        return history
 
 
     def regression_train(self, training_data: pd.DataFrame, seuil: float) -> int:
@@ -95,30 +97,30 @@ class PerceptronGradient(Perceptron):
         Stops when the error is below the specified threshold or after completing all epochs.
         :param training_data: A DataFrame containing the training data with inputs and labels.
         :param seuil: The threshold for error to stop training.
-        :return: 1 if training is successful, 0 if it stops after all epochs.
+        :return: history if training is successful, history if it stops after all epochs.
         """
+        history = History()
         for epoch in range(self.epochs):
             y = self.predict(training_data)
             d = training_data["label"].values
             error = self.error_regression(y,d)
+            history.log(epoch=epoch, mse=np.mean(error), accuracy=np.mean(y == d))
             if np.mean(error) <= seuil:
-                print(
-                    f"Training complete for {epoch + 1} epochs with error {np.mean(error)}\nw0 : {self.weights[0]}\nw1 : {self.weights[1]}\n")
-                return 1
+                print(f"Training complete after {epoch + 1} epochs.")
+                return history
             self.correct(y, training_data["label"], training_data["inputs"])
-        print(f"Training stopped after {self.epochs} epochs with error {np.mean(error)}")
-        return 0
+        print(f"Training stopped after {epoch} epochs with error {np.mean(error)}")
+        return history
 
 
-    def mode_choose(self, training_data: pd.DataFrame, seuil: float, mode: str) -> int:
+    def mode_choose(self, training_data: pd.DataFrame, seuil: float, mode: str) -> int or str:
         """
         Chooses the training mode for the perceptron: classification or regression.
         Executes the corresponding training method based on the specified mode.
         :param training_data: A DataFrame containing the training data with inputs and labels.
         :param seuil: The threshold for error to stop training.
-        :param mode: A boolean indicating the training mode.
-                     True for classification, False for regression.
-        :return: 1 if training is successful, 0 if it stops after all epochs.
+        :param mode: A string indicating the training mode.
+        :return: history if training is successful, history if it stops after all epochs.
         """
         if mode == "classification":
             return self.classification_train(training_data, seuil)
