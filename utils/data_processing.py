@@ -59,7 +59,6 @@ def load_dataframe_from_file(file_name: str, nbr_labels: int):
     })
 
     if nbr_labels == 1:
-        # Extraire directement la valeur unique au lieu d'un array de taille 1
         result["label"] = result["labels"].apply(lambda x: x[0])
         return result[["input", "label"]]
 
