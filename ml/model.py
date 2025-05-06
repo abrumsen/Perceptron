@@ -70,7 +70,7 @@ class Model:
             errors = np.append(errors, error)
         return predictions, errors
 
-    def fit(self, x_train: np.ndarray, y_train: np.ndarray, learning_rate: float, threshold: float, epochs:int) -> bool:
+    def fit(self, x_train: np.ndarray, y_train: np.ndarray, learning_rate: float, threshold: float, epochs:int, verbose: bool=False) -> bool:
         """
         Trains the model.
         :param x_train: Training data.
@@ -78,6 +78,7 @@ class Model:
         :param learning_rate: Learning rate.
         :param threshold:
         :param epochs: Number of training epochs.
+        :param verbose: Verbosity.
         """
         for epoch in range(epochs):
             self._evaluate_batch(x_train, y_train, learning_rate, True)
@@ -88,7 +89,7 @@ class Model:
             if mse < threshold or (predictions.all() == y_train.all()):
                 print(f"Training complete after {epoch + 1} epochs.")
                 return True
-            if epoch % 20 == 0:
+            if epoch % 20 == 0 and verbose:
                 print(f"Epoch :{epoch + 1}, MSE: {mse:.4f}")
         print(f"Training stopped after {epochs} epochs.")
         return False
