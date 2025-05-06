@@ -70,5 +70,5 @@ def generate_random_data(file_path:str, iteration_number):
 
 
 
-
-print(load_dataframe_from_file("../datasets/table_4_12.csv"))
+if __name__ == "__main__":
+    print(load_dataframe_from_file("../datasets/table_2_3.csv"))
