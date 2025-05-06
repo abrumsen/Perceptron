@@ -52,16 +52,17 @@ class Model:
             # Calculate MSE with new weights.
             errors = np.array([])
             predictions = np.array([])
-            for iteration in x_train:
+            for idx,iteration in enumerate(x_train):
+                iteration = np.array(iteration)
                 y_pred = self.forward(iteration)
-                error = y_train - y_pred
+                error = y_train[idx] - y_pred
                 errors = np.append(errors, error)
                 predictions = np.append(predictions, y_pred)
             mse = np.mean(0.5 * errors ** 2)
             # Training exit condition
             if mse < threshold or (predictions.all() == y_train.all()):
                 print(f"Training complete after {epoch + 1} epochs.")
-                break
+                return True
             if epoch % 20 == 0:
                 print(f"Epoch :{epoch + 1}, MSE: {mse:.4f}")
         print(f"Training stopped after {epochs} epochs.")
