@@ -82,12 +82,12 @@ class PerceptronGradient(Perceptron):
             y = self.predict(training_data)
             s = self.activation_function(y)
             error = self.error_classification(y, s)
-            history.log(epoch=epoch, mse=np.mean(error), accuracy=np.mean(y.round() == s))
+            history.log(epoch=epoch, mse=np.mean(error), accuracy=np.mean(s == training_data["label"].values))
             if np.mean(error) <= seuil and (s == training_data["label"].values).all():
                 print(f"Training complete after {epoch + 1} epochs.")
                 return history
             self.correct(y, training_data["label"], training_data["inputs"])
-        print(f"Training stopped after {epoch} epochs with error {np.mean(error)}")
+        print(f"Training stopped after {epoch + 1} epochs with error {np.mean(error)}")
         return history
 
 
@@ -104,12 +104,12 @@ class PerceptronGradient(Perceptron):
             y = self.predict(training_data)
             d = training_data["label"].values
             error = self.error_regression(y,d)
-            history.log(epoch=epoch, mse=np.mean(error), accuracy=np.mean(y == d))
+            history.log(epoch=epoch, mse=np.mean(error))
             if np.mean(error) <= seuil:
                 print(f"Training complete after {epoch + 1} epochs.")
                 return history
             self.correct(y, training_data["label"], training_data["inputs"])
-        print(f"Training stopped after {epoch} epochs with error {np.mean(error)}")
+        print(f"Training stopped after {epoch + 1} epochs with error {np.mean(error)}")
         return history
 
 
