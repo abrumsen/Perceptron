@@ -81,7 +81,7 @@ class Model:
         predictions = []
         errors = []
 
-        # # Shuffle the data only when adjusting
+        # Shuffle the data only when adjusting
         if update:
             indices = np.arange(x_train.shape[0])
             np.random.shuffle(indices)

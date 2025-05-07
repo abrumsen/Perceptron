@@ -22,6 +22,10 @@ Implementing different types of perceptrons from scratch without deep learning l
 2. Create a virtual environment (optional but recommended)
 3. Install dependencies with pip
 
+## ⚡ Getting started
+
+Take a look at our jupyter notebooks!
+
 ## 👨‍💻 Contributors
 
 - [A. Brumsen](https://github.com/abrumsen)
