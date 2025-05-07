@@ -39,16 +39,18 @@ def p_data_to_dataframe(iteration:int, weights:list, variables:list, obtained_va
     return pd.DataFrame(p_data)
 
 
-def load_dataframe_from_file(file_name: str, nbr_labels: int=1):
+def load_dataframe_from_file(file_name: str, nbr_labels: int=1, add_x0: bool = True):
     """
     Load data from a CSV file and return it as a DataFrame with 'input' and 'label(s)' columns.
 
+    :param add_x0: True if adding x0 is needed, False otherwise.
     :param file_name: Path to the CSV file.
     :param nbr_labels: Number of label columns at the end of the file.
     :return: A pandas DataFrame with 'input' and 'label(s)' columns.
     """
     df = pd.read_csv(file_name, sep=",", header=None)
-    df.insert(0, "x0", 1)
+    if add_x0:
+        df.insert(0, "x0", 1)
 
     if nbr_labels == 0:
         inputs = df.iloc[:, -nbr_labels:].values
@@ -95,5 +97,5 @@ def generate_random_data(file_path:str, iteration_number):
 
 
 if __name__ == "__main__":
-    df = load_dataframe_from_file("../datasets/table_4_14.csv", nbr_labels=3)
+    df = load_dataframe_from_file("../datasets/table_4_14.csv", nbr_labels=3, add_x0=False)
     print(df)
