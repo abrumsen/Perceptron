@@ -32,8 +32,7 @@ class PerceptronAdaline(Perceptron):
         return 0.5*np.sum((expected_value - actual_value)**2)
 
     def mean_quadratic_error(self, expected_value:np.array, inputs:np.ndarray) -> float:
-        predictions = self.predict(inputs)
-        return self.quadratic_error(expected_value, predictions)/len(predictions)
+        return self.quadratic_error(expected_value, inputs)/len(inputs)
 
     def train_classification(self, dataset: pd.DataFrame, seuil: float, until_no_error: bool=False) -> History:
         training_data = np.stack(dataset["inputs"].values)
@@ -50,24 +49,17 @@ class PerceptronAdaline(Perceptron):
                 error = y_i - prediction
                 self.weights += self.learning_rate * error * x_i
                 predictions_epoch[i] = prediction
-
-            mean_quad_error = self.mean_quadratic_error(expected_values, training_data)
-            accuracy = np.mean(self.activation_function(predictions_epoch) == expected_values)
-
+            actual_prediction = self.predict(training_data)
+            mean_quad_error = self.mean_quadratic_error(expected_values, actual_prediction)
+            accuracy = np.mean(self.activation_function(actual_prediction) == expected_values)
             history.log(epoch=epoch+1, mse=mean_quad_error, accuracy=accuracy, weights=self.weights.copy())
 
             if until_no_error :
-                if mean_quad_error < seuil or ( predictions_epoch == expected_values).all():
-                    print(
-                        f"Training complete after {epoch + 1} epochs with MSE={mean_quad_error} & weights={self.weights} & prediction={predictions_epoch}")
-
+                if mean_quad_error < seuil or accuracy == 1.0:
                     return history
             else:
                 if mean_quad_error < seuil :
-                    print(f"Training complete after {epoch + 1} epochs with MSE={mean_quad_error} & weights={self.weights} & prediction={predictions_epoch}")
-
                     return history
-        print(f"Training stopped after {self.epochs} epochs with final MSE={mean_quad_error}")
         return history
 
     def train_regression(self, dataset: pd.DataFrame, seuil: float) -> History:
