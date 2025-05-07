@@ -62,7 +62,7 @@ class PerceptronAdaline(Perceptron):
                     return history
         return history
 
-    def train_regression(self, dataset: pd.DataFrame, seuil: float, until_no_error: bool=False) -> History:
+    def train_regression(self, dataset: pd.DataFrame, seuil: float) -> History:
         """
         Trains the perceptron with regression using the given training data.
         Stops when the error is below the specified threshold or after completing all epochs.
@@ -85,6 +85,8 @@ class PerceptronAdaline(Perceptron):
             actual_prediction = self.predict(training_data)
             mean_quad_error = self.mean_quadratic_error(expected_values, actual_prediction)
             history.log(epoch=epoch + 1, mse=mean_quad_error, weights=self.weights.copy())
+            if epoch % 1000 == 0 :
+                print(mean_quad_error)
             if mean_quad_error < seuil:
                 return history
         return history
