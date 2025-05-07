@@ -17,6 +17,7 @@ class Model:
         """
         self.layers = layers
         self._connect_layers()
+        self._evaluation = None
 
     def __repr__(self) -> str:
         """
@@ -56,9 +57,36 @@ class Model:
         for layer in reversed(self.layers):
             error = layer.retropropagation(error, learning_rate)
 
-    def _evaluate_batch(self, x_train: np.ndarray, y_train: np.ndarray, learning_rate: float, update: bool) -> tuple[np.ndarray,np.ndarray]:
-        predictions = np.array([])
-        errors = np.array([])
+    def _evaluate_full_batch(self, x_train: np.ndarray, y_train: np.ndarray, learning_rate: float, update: bool) -> tuple[np.ndarray,np.ndarray]:
+        predictions = []
+        errors = []
+
+        for idx, iteration in enumerate(x_train):
+            iteration = np.array(iteration)
+            y_pred = self.forward(iteration)
+            error = y_train[idx] - y_pred
+            predictions.append(y_pred)
+            errors.append(error)
+
+        if update: # Not really a "full-batch" since we redo every one of them
+            for idx, iteration in enumerate(x_train):
+                iteration = np.array(iteration)
+                y_pred = self.forward(iteration)
+                error = y_train[idx] - y_pred
+                self.retropropagation(error, learning_rate)
+
+        return np.array(predictions), np.array(errors)
+
+    def _evaluate_stochastic(self, x_train: np.ndarray, y_train: np.ndarray, learning_rate: float, update: bool) -> tuple[np.ndarray,np.ndarray]:
+        predictions = []
+        errors = []
+
+        # # Shuffle the data only when adjusting
+        if update:
+            indices = np.arange(x_train.shape[0])
+            np.random.shuffle(indices)
+            x_train = x_train[indices]
+            y_train = y_train[indices]
 
         for idx, iteration in enumerate(x_train):
             iteration = np.array(iteration)
@@ -68,25 +96,40 @@ class Model:
             if update:
                 self.retropropagation(error, learning_rate)
 
-            predictions = np.append(predictions, y_pred)
-            errors = np.append(errors, error)
-        return predictions, errors
+            predictions.append(y_pred)
+            errors.append(error)
+        return np.array(predictions), np.array(errors)
 
-    def fit(self, x_train: np.ndarray, y_train: np.ndarray, learning_rate: float, threshold: float, epochs:int, verbose: bool=False) -> History:
+    def _evaluate_mini_batch(self, x_train: np.ndarray, y_train: np.ndarray, learning_rate: float, update: bool) -> tuple[np.ndarray,np.ndarray]:
+        pass
+
+    def fit(self, x_train: np.ndarray, y_train: np.ndarray, learning_rate: float, threshold: float, epochs:int, strategy: str="stochastic", verbose: bool=False) -> History:
         """
         Trains the model.
         :param x_train: Training data.
         :param y_train: Training labels.
         :param learning_rate: Learning rate.
-        :param threshold:
+        :param threshold: MSE threshold.
         :param epochs: Number of training epochs.
+        :param strategy: Learning strategy.
         :param verbose: Verbosity.
         """
         history = History()
+        strategy = strategy.lower()
+        match strategy:
+            case "full-batch":
+                self._evaluation = self._evaluate_full_batch
+            case "stochastic":
+                self._evaluation = self._evaluate_stochastic
+            case "mini-batch":
+                raise NotImplementedError("Mini-batch evaluation not yet implemented.")
+            case _:
+                raise ValueError(f"Unknown learning strategy: {strategy}")
+        print(f"Training using {strategy} strategy.")
         for epoch in range(epochs):
-            self._evaluate_batch(x_train, y_train, learning_rate, True)
+            self._evaluation(x_train, y_train, learning_rate, update=True)
             # Calculate MSE with new weights.
-            predictions, errors = self._evaluate_batch(x_train, y_train, learning_rate, False)
+            predictions, errors = self._evaluation(x_train, y_train, learning_rate, update=False)
             mse = np.mean(0.5 * errors ** 2)
             predictions_rounded = predictions.round().reshape(y_train.shape)
             history.log(epoch=epoch, mse=mse, accuracy=np.mean(predictions_rounded == y_train))
@@ -94,7 +137,7 @@ class Model:
             if mse < threshold:
                 print(f"Training complete after {epoch + 1} epochs.")
                 return history
-            if epoch % 20 == 0 and verbose:
+            if epoch % 1000 == 0 and verbose:
                 print(f"Epoch :{epoch + 1}, MSE: {mse:.4f}")
         print(f"Training stopped after {epochs} epochs.")
         return history
