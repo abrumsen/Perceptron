@@ -49,9 +49,11 @@ class PerceptronAdaline(Perceptron):
                 error = y_i - prediction
                 self.weights += self.learning_rate * error * x_i
                 predictions_epoch[i] = prediction
-            actual_prediction = self.predict(training_data)
-            mean_quad_error = self.mean_quadratic_error(expected_values, actual_prediction)
-            accuracy = np.mean(self.activation_function(actual_prediction) == expected_values)
+            # actual_prediction = self.predict(training_data)
+            # mean_quad_error = self.mean_quadratic_error(expected_values, actual_prediction)
+            # accuracy = np.mean(self.activation_function(actual_prediction) == expected_values)
+            mean_quad_error = self.mean_quadratic_error(expected_values, predictions_epoch)
+            accuracy = np.mean(self.activation_function(predictions_epoch) == expected_values)
             history.log(epoch=epoch+1, mse=mean_quad_error, accuracy=accuracy, weights=self.weights.copy())
 
             if until_no_error :
