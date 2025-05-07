@@ -35,26 +35,14 @@ class PerceptronGradient(Perceptron):
 
 
     @staticmethod
-    def error_classification(array_y:np.ndarray, array_s:np.ndarray) -> np.ndarray:
-        """
-        Computes the error for a single epoch of training in mode classification.
-        :param array_y: The predicted outputs from the perceptron.
-        :param array_s: The actual outputs after applying the activation function.
-        :return: The error value for each sample in the dataset.
-        """
-        array_error = 0.5*(array_y - array_s)**2
-        return array_error
-
-
-    @staticmethod
-    def error_regression(array_y:np.ndarray, array_d: np.ndarray) -> np.ndarray:
+    def error(array_y:np.ndarray, array_d: np.ndarray) -> np.ndarray:
         """
         Computes the error for a single epoch of training in mode regression.
         :param array_y: The predicted outputs from the perceptron.
         :param array_d The actual outputs.
         :return: The error value for each sample in the dataset.
         """
-        array_error = 0.5*(array_d - array_y)**2
+        array_error = 0.5*(array_y - array_d)**2
         return array_error
 
 
@@ -69,7 +57,7 @@ class PerceptronGradient(Perceptron):
         self.weights += self.learning_rate * np.dot(array_error_to_correct, array_x)
 
 
-    def classification_train(self, training_data: pd.DataFrame, seuil: float) -> History:
+    def classification_train(self, training_data: pd.DataFrame, seuil: float, until_no_error:bool) -> History:
         """
         Trains the perceptron with classification using the given training data.
         Stops when the error is below the specified threshold or after completing all epochs.
@@ -81,9 +69,13 @@ class PerceptronGradient(Perceptron):
         for epoch in range(self.epochs):
             y = self.predict(training_data)
             s = self.activation_function(y)
-            error = self.error_classification(y, s)
+            d = training_data["label"].values
+            error = self.error(y, d)
             history.log(epoch=epoch, mse=np.mean(error), accuracy=np.mean(s == training_data["label"].values))
-            if np.mean(error) <= seuil and (s == training_data["label"].values).all():
+            if np.mean(error) <= seuil and (s == training_data["label"].values).all() and until_no_error == True:
+                print(f"Training complete after {epoch + 1} epochs.")
+                return history
+            elif np.mean(error) <= seuil or (s == training_data["label"].values).all() and until_no_error == False:
                 print(f"Training complete after {epoch + 1} epochs.")
                 return history
             self.correct(y, training_data["label"], training_data["inputs"])
@@ -103,7 +95,7 @@ class PerceptronGradient(Perceptron):
         for epoch in range(self.epochs):
             y = self.predict(training_data)
             d = training_data["label"].values
-            error = self.error_regression(y,d)
+            error = self.error(y,d)
             history.log(epoch=epoch, mse=np.mean(error))
             if np.mean(error) <= seuil:
                 print(f"Training complete after {epoch + 1} epochs.")
@@ -113,7 +105,7 @@ class PerceptronGradient(Perceptron):
         return history
 
 
-    def mode_choose(self, training_data: pd.DataFrame, seuil: float, mode: str) -> int or str:
+    def mode_choose(self, training_data: pd.DataFrame, seuil: float, mode: str, until_no_error:bool) -> int or str:
         """
         Chooses the training mode for the perceptron: classification or regression.
         Executes the corresponding training method based on the specified mode.
@@ -123,7 +115,7 @@ class PerceptronGradient(Perceptron):
         :return: history if training is successful, history if it stops after all epochs.
         """
         if mode == "classification":
-            return self.classification_train(training_data, seuil)
+            return self.classification_train(training_data, seuil, until_no_error)
         elif mode == "regression":
             return self.regression_train(training_data, seuil)
         else:

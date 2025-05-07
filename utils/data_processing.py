@@ -16,8 +16,8 @@ def store_data(dataframe:pd.DataFrame, file_path:str):
         big_dataframe = pd.concat(frames, axis=0)
     else:
         big_dataframe = dataframe
-    big_dataframe = big_dataframe.sort_values(by="Iteration")
-    big_dataframe.to_csv(file_path, index=True, sep=";", mode="w")
+    # big_dataframe = big_dataframe.sort_values(by="Iteration")
+    big_dataframe.to_csv(file_path, index=True, sep=",", mode="w")
 
 def p_data_to_dataframe(iteration:int, weights:list, variables:list, obtained_value:float, expected_value:float):
     """
@@ -50,19 +50,29 @@ def load_dataframe_from_file(file_name: str, nbr_labels: int=1):
     df = pd.read_csv(file_name, sep=",", header=None)
     df.insert(0, "x0", 1)
 
-    inputs = df.iloc[:, :-nbr_labels].values
-    labels = df.iloc[:, -nbr_labels:].values
+    if nbr_labels == 0:
+        inputs = df.iloc[:, -nbr_labels:].values
 
-    result = pd.DataFrame({
-        "inputs": [np.array(row) for row in inputs],
-        "label": [np.array(row) for row in labels]
-    })
+        result = pd.DataFrame({
+            "inputs": [np.array(row) for row in inputs]
+        })
 
-    if nbr_labels == 1:
-        result["label"] = result["label"].apply(lambda x: x[0])
-        return result[["inputs", "label"]]
+    else:
+        inputs = df.iloc[:, :-nbr_labels].values
+        labels = df.iloc[:, -nbr_labels:].values
+
+        result = pd.DataFrame({
+            "inputs": [np.array(row) for row in inputs],
+            "label": [np.array(row) for row in labels]
+        })
+
+        if nbr_labels == 1:
+            result["label"] = result["label"].apply(lambda x: x[0])
+            return result[["inputs", "label"]]
 
     return result
+
+
 def generate_random_data(file_path:str, iteration_number):
     """
     generates a dataframe containing random values to mimic the result of perceptron training
