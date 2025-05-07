@@ -62,7 +62,7 @@ class PerceptronAdaline(Perceptron):
                     return history
         return history
 
-    def train_regression(self, dataset: pd.DataFrame, seuil: float) -> History:
+    def train_regression(self, dataset: pd.DataFrame, seuil: float, until_no_error: bool=False) -> History:
         """
         Trains the perceptron with regression using the given training data.
         Stops when the error is below the specified threshold or after completing all epochs.
@@ -70,30 +70,31 @@ class PerceptronAdaline(Perceptron):
         :param seuil: The threshold for error to stop training.
         :return: history if training is successful, history if it stops after all epochs.
         """
-        inputs = np.stack(dataset["inputs"].values)  # (n_samples, n_features)
-        expected_values = dataset["label"].values  # (n_samples,)
+        training_data = np.stack(dataset["inputs"].values)
+        expected_values = dataset["label"].values
         history = History()
-
         for epoch in range(self.epochs):
             predictions_epoch = np.zeros_like(expected_values, dtype=float)
 
-            for i in range(len(inputs)):
-                x_i = inputs[i]
+            for i in range(len(training_data)):
+                x_i = training_data[i]
                 y_i = expected_values[i]
 
-                prediction = self.predict(x_i)  # sortie réelle
+                prediction = self.predict(x_i)
                 error = y_i - prediction
-                self.weights += self.learning_rate * error * x_i  # mise à jour incrémentale
+                self.weights += self.learning_rate * error * x_i
                 predictions_epoch[i] = prediction
+            actual_prediction = self.predict(training_data)
+            mean_quad_error = self.mean_quadratic_error(expected_values, actual_prediction)
+            accuracy = np.mean(self.activation_function(actual_prediction) == expected_values)
+            history.log(epoch=epoch + 1, mse=mean_quad_error, accuracy=accuracy, weights=self.weights.copy())
 
-            mse = np.mean((expected_values - predictions_epoch) ** 2)
-            history.log(epoch=epoch, mse=mse)
-
-            if mse <= seuil:
-                print(f"Training complete after {epoch + 1} epochs with MSE={mse:.4f} & weights={self.weights:.4f}")
-                return history
-
-        print(f"Training stopped after {self.epochs} epochs with final MSE={mse:.4f}")
+            if until_no_error:
+                if mean_quad_error < seuil or accuracy == 1.0:
+                    return history
+            else:
+                if mean_quad_error < seuil:
+                    return history
         return history
 
 
