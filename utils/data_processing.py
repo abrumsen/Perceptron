@@ -17,7 +17,7 @@ def store_data(dataframe:pd.DataFrame, file_path:str):
     else:
         big_dataframe = dataframe
     # big_dataframe = big_dataframe.sort_values(by="Iteration")
-    big_dataframe.to_csv(file_path, index=False, sep=",", mode="w")
+    big_dataframe.to_csv(file_path, index=True, sep=",", mode="w", header=False)
 
 def p_data_to_dataframe(iteration:int, weights:list, variables:list, obtained_value:float, expected_value:float):
     """
@@ -99,5 +99,3 @@ def generate_random_data(file_path:str, iteration_number):
 if __name__ == "__main__":
     df = load_dataframe_from_file("../datasets/table_4_14.csv", nbr_labels=3, add_x0=False)
     print(df)
-    store_data(df, file_path="./data.csv")
-
