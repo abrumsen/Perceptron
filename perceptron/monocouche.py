@@ -66,7 +66,7 @@ class Layer:
             elif isinstance(neurone, PerceptronGradient):
                 history = neurone.mode_choose(custom_data, seuil=seuil, mode="classification")
             elif isinstance(neurone, PerceptronAdaline):
-                history = neurone.train_classification(custom_data, seuil=seuil, until_no_error=True)
+                history = neurone.train_classification(custom_data, seuil=seuil, until_no_error=True, accuracy_relative=True)
             else:
                 raise ValueError("Unknown neuron type")
 
