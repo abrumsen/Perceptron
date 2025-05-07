@@ -105,7 +105,7 @@ class PerceptronGradient(Perceptron):
         return history
 
 
-    def mode_choose(self, training_data: pd.DataFrame, seuil: float, mode: str, until_no_error:bool) -> int or str:
+    def mode_choose(self, training_data: pd.DataFrame, seuil: float, mode: str, until_no_error:bool=False) -> int or str:
         """
         Chooses the training mode for the perceptron: classification or regression.
         Executes the corresponding training method based on the specified mode.
