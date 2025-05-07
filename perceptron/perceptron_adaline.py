@@ -75,26 +75,18 @@ class PerceptronAdaline(Perceptron):
         history = History()
         for epoch in range(self.epochs):
             predictions_epoch = np.zeros_like(expected_values, dtype=float)
-
             for i in range(len(training_data)):
                 x_i = training_data[i]
                 y_i = expected_values[i]
-
                 prediction = self.predict(x_i)
                 error = y_i - prediction
                 self.weights += self.learning_rate * error * x_i
                 predictions_epoch[i] = prediction
             actual_prediction = self.predict(training_data)
             mean_quad_error = self.mean_quadratic_error(expected_values, actual_prediction)
-            accuracy = np.mean(self.activation_function(actual_prediction) == expected_values)
-            history.log(epoch=epoch + 1, mse=mean_quad_error, accuracy=accuracy, weights=self.weights.copy())
-
-            if until_no_error:
-                if mean_quad_error < seuil or accuracy == 1.0:
-                    return history
-            else:
-                if mean_quad_error < seuil:
-                    return history
+            history.log(epoch=epoch + 1, mse=mean_quad_error, weights=self.weights.copy())
+            if mean_quad_error < seuil:
+                return history
         return history
 
 
