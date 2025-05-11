@@ -72,10 +72,13 @@ class PerceptronGradient(Perceptron):
             d = training_data["label"].values
             error = self.error(d, y)
             history.log(epoch=epoch, mse=np.mean(error), accuracy=np.mean(s == training_data["label"].values))
-            if np.mean(error) <= seuil and (s == training_data["label"].values).all() and until_no_error == True:
+            if (s == training_data["label"].values).all() and until_no_error == True:
                 print(f"Training complete after {epoch + 1} epochs.")
                 return history
-            elif np.mean(error) <= seuil or (s == training_data["label"].values).all() and until_no_error == False:
+            elif np.mean(error) <= seuil and until_no_error == False:
+                print(f"Training complete after {epoch + 1} epochs.")
+                return history
+            elif np.mean(error) <= seuil and (s == training_data["label"].values).all():
                 print(f"Training complete after {epoch + 1} epochs.")
                 return history
             self.correct(y, training_data["label"], training_data["inputs"])

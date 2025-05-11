@@ -43,10 +43,10 @@ class PerceptronAdaline(Perceptron):
 
             for i in range(len(training_data)):
                 x_i = training_data[i]
-                y_i = expected_values[i]
+                d_i = expected_values[i]
 
                 prediction = self.predict(x_i)
-                error = y_i - prediction
+                error = d_i - prediction
                 self.weights += self.learning_rate * error * x_i
                 predictions_epoch[i] = prediction
             if accuracy_relative:
