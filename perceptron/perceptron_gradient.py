@@ -35,14 +35,14 @@ class PerceptronGradient(Perceptron):
 
 
     @staticmethod
-    def error(array_y:np.ndarray, array_d: np.ndarray) -> np.ndarray:
+    def error(array_d:np.ndarray, array_y: np.ndarray) -> np.ndarray:
         """
         Computes the error for a single epoch of training in mode regression.
         :param array_y: The predicted outputs from the perceptron.
         :param array_d The actual outputs.
         :return: The error value for each sample in the dataset.
         """
-        array_error = 0.5*(array_y - array_d)**2
+        array_error = 0.5*(array_d - array_y)**2
         return array_error
 
 
@@ -70,7 +70,7 @@ class PerceptronGradient(Perceptron):
             y = self.predict(training_data)
             s = self.activation_function(y)
             d = training_data["label"].values
-            error = self.error(y, d)
+            error = self.error(d, y)
             history.log(epoch=epoch, mse=np.mean(error), accuracy=np.mean(s == training_data["label"].values))
             if np.mean(error) <= seuil and (s == training_data["label"].values).all() and until_no_error == True:
                 print(f"Training complete after {epoch + 1} epochs.")
@@ -95,7 +95,7 @@ class PerceptronGradient(Perceptron):
         for epoch in range(self.epochs):
             y = self.predict(training_data)
             d = training_data["label"].values
-            error = self.error(y,d)
+            error = self.error(d,y)
             history.log(epoch=epoch, mse=np.mean(error))
             if np.mean(error) <= seuil:
                 print(f"Training complete after {epoch + 1} epochs.")
