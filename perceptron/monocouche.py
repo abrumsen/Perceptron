@@ -1,6 +1,6 @@
 from enum import Enum
-import numpy as np
 import pandas as pd
+import numpy as np
 
 from perceptron import PerceptronSimple, PerceptronGradient, PerceptronAdaline
 
@@ -23,6 +23,7 @@ class Layer:
         self.epochs = epochs
         self.neurone_type = neurone_type
         self.neurons = self._create_neurons()
+        self.histories = []
 
     def _create_neurons(self):
         neurons = []
@@ -41,49 +42,39 @@ class Layer:
         else:
             raise ValueError(f"Unsupported neuron type: {self.neurone_type}")
 
-    def predict(self, inputs):
-        predict = [neuron.predict(inputs) for neuron in self.neurons]
-        round_predict = [neuron.round_predict(inputs) for neuron in self.neurons]
+    def predict(self, inputs : np.array):
+        raw_predictions = np.array([neuron.predict(inputs) for neuron in self.neurons])
+        rounded_predictions = np.array([neuron.round_predict(inputs) for neuron in self.neurons])
 
-        return predict, round_predict
+        return raw_predictions.T, rounded_predictions.T
 
-    def train_layer(self, data, seuil=0.01, mode_classification=True):
+    def train_layer(self, dataset:pd.DataFrame, seuil:float = 0, initiate_weights_zero:bool = True):
+        self.histories = []
 
         for idx, neurone in enumerate(self.neurons):
-            print(f"\n--- Training in progress for neuron n°{idx + 1} ---")
             custom_data = pd.DataFrame({
-                "inputs": data["inputs"],
-                "label": data["labels"].apply(lambda labels: labels[idx])
+                "inputs": dataset["inputs"],
+                "label": dataset["label"].apply(lambda labels: labels[idx])
             })
+
+            input_shape = len(dataset["inputs"].iloc[0])
+            if initiate_weights_zero:
+                neurone.weights = np.zeros(input_shape, dtype=float)
+
             if isinstance(neurone, PerceptronSimple):
-                # neurone.weights = np.array(
-                #     [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                #      0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-                neurone.train(custom_data)
+                history = neurone.train(custom_data)
             elif isinstance(neurone, PerceptronGradient):
-                # neurone.weights = np.array(
-                #     [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                #      0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-                neurone.mode_choose(custom_data, seuil=seuil, mode=mode_classification)
+                history = neurone.mode_choose(custom_data, seuil=seuil, mode="classification")
             elif isinstance(neurone, PerceptronAdaline):
-                # neurone.weights = np.array(
-                #     [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                #      0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-                neurone.train(custom_data, seuil=seuil)
+                history = neurone.train_classification(custom_data, seuil=seuil, until_no_error=True, accuracy_relative=True)
             else:
                 raise ValueError("Unknown neuron type")
 
+            self.histories.append(history)
 
-# data = pd.DataFrame({
-#     "inputs": [np.array([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
-#                np.array([1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0]),
-#                np.array([1, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1]),
-#                np.array([1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0])],
-#     "labels": [np.array([1, -1, -1, -1]), np.array([-1, 1, -1, -1]), np.array([-1, -1, 1, -1]),
-#                np.array([-1, -1, -1, 1])]
-# })
-# predict_data_void = np.array([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-# predict_data_cross = np.array([1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0])
-# macouche = Layer(nbr_neurones=4, input_size=25, neurone_type=NeuronType.ADALINE, learning_rate=0.001, epochs=1000)
-# macouche.train_layer(data=data, seuil=0)
-# print(f"\nResults :\n{macouche.predict(predict_data_void)}")
+    def get_history(self, neurone_index=None):
+        if neurone_index is None:
+            return self.histories
+        if 0 <= neurone_index < len(self.histories):
+            return self.histories[neurone_index]
+        raise IndexError("Neuron index out of range")

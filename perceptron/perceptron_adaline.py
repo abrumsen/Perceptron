@@ -34,7 +34,7 @@ class PerceptronAdaline(Perceptron):
     def mean_quadratic_error(self, expected_value:np.array, inputs:np.ndarray) -> float:
         return self.quadratic_error(expected_value, inputs)/len(inputs)
 
-    def train_classification(self, dataset: pd.DataFrame, seuil: float, until_no_error: bool=False) -> History:
+    def train_classification(self, dataset: pd.DataFrame, seuil: float, until_no_error: bool=False, accuracy_relative:bool = False) -> History:
         training_data = np.stack(dataset["inputs"].values)
         expected_values = dataset["label"].values
         history = History()
@@ -49,9 +49,13 @@ class PerceptronAdaline(Perceptron):
                 error = y_i - prediction
                 self.weights += self.learning_rate * error * x_i
                 predictions_epoch[i] = prediction
-            actual_prediction = self.predict(training_data)
-            mean_quad_error = self.mean_quadratic_error(expected_values, actual_prediction)
-            accuracy = np.mean(self.activation_function(actual_prediction) == expected_values)
+            if accuracy_relative:
+                mean_quad_error = self.mean_quadratic_error(expected_values, predictions_epoch)
+                accuracy = np.mean(self.activation_function(predictions_epoch) == expected_values)
+            else:
+                actual_prediction = self.predict(training_data)
+                mean_quad_error = self.mean_quadratic_error(expected_values, actual_prediction)
+                accuracy = np.mean(self.activation_function(actual_prediction) == expected_values)
             history.log(epoch=epoch+1, mse=mean_quad_error, accuracy=accuracy, weights=self.weights.copy())
 
             if until_no_error :
